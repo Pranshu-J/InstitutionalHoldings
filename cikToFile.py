@@ -1,7 +1,7 @@
 import requests
 import json
 
-def get_sec_filing_url():
+def get_sec_filing_url(quarter):
     """
     Reads the first CIK from ciks.txt, fetches the SEC filing URL, writes it to urls.txt,
     removes the used CIK from ciks.txt, and returns the URL.
@@ -21,7 +21,10 @@ def get_sec_filing_url():
     
     cikNumber = lines[0].strip()
     
-    search_url = f"https://efts.sec.gov/LATEST/search-index?q=13f-hr%20information%20table&dateRange=custom&category=custom&entityName={cikNumber}&startdt=2025-07-01&enddt=2025-09-30&forms=13F-HR"
+    if quarter == 1:
+        search_url = f"https://efts.sec.gov/LATEST/search-index?q=13f-hr%20information%20table&dateRange=custom&category=custom&entityName={cikNumber}&startdt=2025-07-01&enddt=2025-09-30&forms=13F-HR"
+    else:
+        search_url = f"https://efts.sec.gov/LATEST/search-index?q=13f-hr%20information%20table&dateRange=custom&category=custom&entityName={cikNumber}&startdt=2025-04-01&enddt=2025-06-30&forms=13F-HR"
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:143.0) Gecko/20100101 Firefox/143.0',
         'Accept': 'application/json',
@@ -59,8 +62,9 @@ def get_sec_filing_url():
         f.write(filing_url + "\n")
 
     # Remove the first line and shift the rest up
-    with open("ciks.txt", "w") as f:
-        f.writelines(lines[1:])
+    if quarter == 1:
+        with open("ciks.txt", "w") as f:
+            f.writelines(lines[1:])
     
     print(f"Processed CIK {cikNumber}, URL written to urls.txt.")
     return filing_url
